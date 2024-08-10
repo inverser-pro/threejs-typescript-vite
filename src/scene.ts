@@ -19,13 +19,14 @@ import {
   WebGLRenderer,
 } from 'three'
 // import { DragControls } from 'three/examples/jsm/controls/DragControls'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 // import * as animations from './helpers/animations'
 // import { toggleFullScreen } from './helpers/fullscreen'
 import { resizeRendererToDisplaySize } from './helpers/responsiveness'
 import {loadModel} from './utils/loader'
 import settings from './utils/settings'
+// import CarFunc from './utils/CarFunc'
 
 // let canvas: HTMLElement
 let renderer: WebGLRenderer
@@ -35,7 +36,7 @@ let renderer: WebGLRenderer
   , pointLight: PointLight
   // , cube: Mesh
   , camera: PerspectiveCamera
-  , cameraControls: OrbitControls
+  // , cameraControls: OrbitControls
   // , dragControls: DragControls
   // , axesHelper: AxesHelper
   // , pointLightHelper: PointLightHelper
@@ -59,7 +60,6 @@ function init() {
     renderer.shadowMap.type = PCFSoftShadowMap
     scene = new Scene()
 
-    const model = loadModel(settings.model1,scene);
     // console.log(model);
 
     // Light — PointLight
@@ -72,6 +72,7 @@ function init() {
     pointLight.shadow.mapSize.width = 2048
     pointLight.shadow.mapSize.height = 2048
     scene.add(pointLight)
+    
 
 /*     const sideLength = 1
         , cubeGeometry = new BoxGeometry(sideLength, sideLength, sideLength)
@@ -102,11 +103,14 @@ function init() {
     camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
     camera.position.set(2, 2, 5)
 
-    cameraControls = new OrbitControls(camera, canvas)
+    // cameraControls = new OrbitControls(camera, canvas)
     // cameraControls.target = cube.position.clone()
-    cameraControls.enableDamping = true
-    cameraControls.autoRotate = false
-    cameraControls.update()
+    // cameraControls.enableDamping = true
+    // cameraControls.autoRotate = false
+    // cameraControls.update()
+
+    const model = loadModel(settings.model1,scene,camera,pointLight);
+
   {
     const gridHelper = new GridHelper(9999, 9999, 'teal', 'darkgray')
     gridHelper.position.y = -0.01
@@ -136,7 +140,7 @@ function animate() {
     camera.updateProjectionMatrix()
   }
 
-  cameraControls.update()
+  // cameraControls.update()
 
   renderer.render(scene, camera)
 }

@@ -2,6 +2,8 @@
 ## Mazda RX 7 3D Model loaded to scene
 <img width="796" alt="screenshot" src="https://raw.githubusercontent.com/inverser-pro/threejs-typescript-vite/main/public/intro.jpg">
 
+Model downloaded from https://sketchfab.com/3d-models/mazda-rx-7-car-404b2aefdf084f01bc3d75559c9c4088
+
 # Three.js Vite Template with TypeScript
 
 Three.js + Vite + TypeScript starter

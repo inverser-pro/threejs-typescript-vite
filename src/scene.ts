@@ -19,7 +19,7 @@ import {
   WebGLRenderer,
 } from 'three'
 // import { DragControls } from 'three/examples/jsm/controls/DragControls'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 // import * as animations from './helpers/animations'
 // import { toggleFullScreen } from './helpers/fullscreen'
@@ -64,7 +64,7 @@ function init() {
 
     // Light — PointLight
     pointLight = new PointLight('white', 20, 100)
-    pointLight.position.set(-2, 2, 2)
+    pointLight.position.set(2, 2, 2)
     pointLight.castShadow = true
     pointLight.shadow.radius = 4
     pointLight.shadow.camera.near = 0.5
@@ -104,7 +104,7 @@ function init() {
     camera.position.set(2, 2, 5)
 
     // cameraControls = new OrbitControls(camera, canvas)
-    // cameraControls.target = cube.position.clone()
+    // // cameraControls.target = cube.position.clone()
     // cameraControls.enableDamping = true
     // cameraControls.autoRotate = false
     // cameraControls.update()

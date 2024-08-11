@@ -1,50 +1,27 @@
-// import GUI from 'lil-gui'
 import './style.css'
 import {
-  // AmbientLight,
-  // AxesHelper,
-  // BoxGeometry,
   Clock,
   GridHelper,
-  // LoadingManager,
   Mesh,
   MeshLambertMaterial,
-  // MeshStandardMaterial,
   PCFSoftShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
   PointLight,
-  // PointLightHelper,
   Scene,
   WebGLRenderer,
 } from 'three'
-// import { DragControls } from 'three/examples/jsm/controls/DragControls'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
-// import * as animations from './helpers/animations'
-// import { toggleFullScreen } from './helpers/fullscreen'
 import { resizeRendererToDisplaySize } from './helpers/responsiveness'
 import {loadModel} from './utils/loader'
 import settings from './utils/settings'
-// import CarFunc from './utils/CarFunc'
-
-// let canvas: HTMLElement
 let renderer: WebGLRenderer
   , scene: Scene
-  // , loadingManager: LoadingManager
-  // , ambientLight: AmbientLight
   , pointLight: PointLight
-  // , cube: Mesh
   , camera: PerspectiveCamera
-  // , cameraControls: OrbitControls
-  // , dragControls: DragControls
-  // , axesHelper: AxesHelper
-  // , pointLightHelper: PointLightHelper
   , clock: Clock
   , stats: Stats
-  // , gui: GUI
-
-// const animation = { enabled: true, play: true }
 
 const DEBUG = 0;
 let cameraControls: OrbitControls;
@@ -70,18 +47,6 @@ function init() {
     pointLight.shadow.mapSize.width = 2048
     pointLight.shadow.mapSize.height = 2048
     scene.add(pointLight)
-    
-
-/*     const sideLength = 1
-        , cubeGeometry = new BoxGeometry(sideLength, sideLength, sideLength)
-        , cubeMaterial = new MeshStandardMaterial({
-          color: '#f69f1f',
-          metalness: 0.5,
-          roughness: 0.7,
-        })
-    cube = new Mesh(cubeGeometry, cubeMaterial)
-    cube.castShadow = true
-    cube.position.y = 0.5 */
 
     const planeGeometry = new PlaneGeometry(9999, 9999)
         , planeMaterial = new MeshLambertMaterial({
@@ -95,14 +60,12 @@ function init() {
     plane.receiveShadow = true;
     plane.position.y=-.01
 
-    // scene.add(cube)
     scene.add(plane)
 
     camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
     camera.position.set(0, 2, 5)
     if(DEBUG){
       cameraControls = new OrbitControls(camera, canvas)
-      // cameraControls.target = cube.position.clone()
       cameraControls.enableDamping = true
       cameraControls.autoRotate = false
       cameraControls.update()
@@ -127,11 +90,6 @@ function animate() {
   requestAnimationFrame(animate)
 
   stats.update()
-
-/*   if (animation.enabled && animation.play) {
-    animations.rotate(cube, clock, Math.PI / 3)
-    animations.bounce(cube, clock, 1, 0.5, 0.5)
-  } */
 
   if (resizeRendererToDisplaySize(renderer)) {
     const canvas = renderer.domElement

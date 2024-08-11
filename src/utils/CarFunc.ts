@@ -8,9 +8,9 @@ const CarFunc=(
 )=>{
     const acceleration: number      = .01;
     const deceleration: number      = 0.002;
-    let isAccelerating: boolean     = false; // Флаг для отслеживания ускорения
-    let stringAngle : number        = 0;
-    let stringAngleCar : number     = 0;
+    let   isAccelerating: boolean   = false; // Флаг для отслеживания ускорения
+    let   stringAngle : number      = 0;
+    let   stringAngleCar : number   = 0;
     const rotateMoveCoe : number    = .01;
     const maxAngle : number         = .5;
     const velocity : THREE.Vector3  = new THREE.Vector3(0,0,0);
@@ -145,13 +145,13 @@ const CarFunc=(
     function steer(val: number){
         if(val===1){
             stringAngle+=rotateMoveCoe
-            if(stringAngle > .maxAngle)
-                stringAngle=maxAngle
+            if(stringAngle > maxAngle)
+                stringAngle = maxAngle
         }else if(val===-1){
             stringAngle-=rotateMoveCoe
             stringAngleCar-=rotateMoveCoe
             if(stringAngle < -maxAngle)
-                stringAngle=-maxAngle
+                stringAngle = -maxAngle
         }
         stringAngleCar=stringAngle // Запомним поворот колёс
         steerWheel(stringAngle);
@@ -164,8 +164,8 @@ const CarFunc=(
     }
 
     function steerCar(){
-        if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe// В пределах 0
-        if( stringAngleCar > 0)stringAngleCar += rotateMoveCoe// В пределах 0
+        if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe
+        if( stringAngleCar > 0)stringAngleCar += rotateMoveCoe
         if(velocity.z > 0){
             car.rotation.y = stringAngleCar;
             car.position.x = stringAngleCar;
@@ -175,10 +175,6 @@ const CarFunc=(
     car.add(camera,light)
     function moveCar(direction: THREE.Vector3, delta: number){
         var t=car.position.addScaledVector(direction,delta)
-        // light.position.addScaledVector(direction,delta)
-        // wheelGroupFL.position.addScaledVector(direction,delta)
-        // wheelGroupFR.position.addScaledVector(direction,delta)
-        // camera.position.addScaledVector(direction,delta)
         camera.lookAt(t)
     }
 
@@ -209,7 +205,7 @@ const CarFunc=(
     const clock=new THREE.Clock
 
     function animate() {
-        /* const */var delta = clock.getDelta();
+        var delta = clock.getDelta();
         update(delta)
         requestAnimationFrame(animate)
     }

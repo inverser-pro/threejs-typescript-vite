@@ -8,7 +8,7 @@ export function loadModel(
     path: string,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    light: THREE.Light
+    light: THREE.Light,
 ): Promise<THREE.Group>{
     const dracoLoader = new DRACOLoader();
     return new Promise((res,rej)=>{

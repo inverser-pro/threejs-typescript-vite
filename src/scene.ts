@@ -46,21 +46,19 @@ let renderer: WebGLRenderer
 
 // const animation = { enabled: true, play: true }
 
-
+const DEBUG = 0;
+let cameraControls: OrbitControls;
 
 init()
 animate()
 
 function init() {
-
     const canvas: HTMLElement = document.querySelector(`canvas.${settings.canvasClass}`)!
     renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = PCFSoftShadowMap
-    scene = new Scene()
-
-    // console.log(model);
+    scene = new Scene();
 
     // Light — PointLight
     pointLight = new PointLight('white', 20, 100)
@@ -101,15 +99,16 @@ function init() {
     scene.add(plane)
 
     camera = new PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
-    camera.position.set(2, 2, 5)
+    camera.position.set(0, 2, 5)
+    if(DEBUG){
+      cameraControls = new OrbitControls(camera, canvas)
+      // cameraControls.target = cube.position.clone()
+      cameraControls.enableDamping = true
+      cameraControls.autoRotate = false
+      cameraControls.update()
+    }
 
-    // cameraControls = new OrbitControls(camera, canvas)
-    // // cameraControls.target = cube.position.clone()
-    // cameraControls.enableDamping = true
-    // cameraControls.autoRotate = false
-    // cameraControls.update()
-
-    const model = loadModel(settings.model1,scene,camera,pointLight);
+  const model = loadModel(settings.model1,scene,camera,pointLight);
 
   {
     const gridHelper = new GridHelper(9999, 9999, 'teal', 'darkgray')
@@ -139,8 +138,7 @@ function animate() {
     camera.aspect = canvas.clientWidth / canvas.clientHeight
     camera.updateProjectionMatrix()
   }
-
-  // cameraControls.update()
+  if(DEBUG) cameraControls.update()
 
   renderer.render(scene, camera)
 }

@@ -8,10 +8,14 @@ const CarFunc=(
 )=>{
     const acceleration: number        = .01;
     const deceleration: number        = 0.002;
-    let isAccelerating: boolean   = false; // Флаг для отслеживания ускорения
-    let stringAngle : number        = 0;
-    const velocity    : THREE.Vector3 = new THREE.Vector3(0,0,0);
-    const direction   : THREE.Vector3 = new THREE.Vector3(0,0,1);
+    let isAccelerating: boolean       = false; // Флаг для отслеживания ускорения
+    let stringAngle : number          = 0;
+    let stringAngleCar : number       = 0;
+    const rotateMoveCoe : number      = .01;
+    const maxAngle : number           = .5;
+    const velocity : THREE.Vector3 = new THREE.Vector3(0,0,0);
+    const direction : THREE.Vector3 = new THREE.Vector3(0,0,1);
+    const car: THREE.Group            = new THREE.Group();
     const wheels: THREE.Object3D[]    = [];
     const wheelGroupFL: THREE.Group   = new THREE.Group();
     const wheelGroupFR: THREE.Group   = new THREE.Group();
@@ -47,9 +51,22 @@ const CarFunc=(
             microFn(e,wheelGroupFL)
         }
     })
+
+    car.add(model, wheelGroupFL, wheelGroupFR)
     
-    scene.add(wheelGroupFL)
-    scene.add(wheelGroupFR)
+    // scene.add(wheelGroupFL)
+    // scene.add(wheelGroupFR)
+    scene.add(car)
+
+    // const box = new THREE.Box3().setFromObject(model)
+    //             , center = box.getCenter(new THREE.Vector3());
+    // // Перемещаем группу в центр колеса
+    // car.position.copy(center);
+    // // Перемещаем колесо так, чтобы его центр совпал с началом координат группы
+    // model.position.sub(center);
+    // // Добавляем колесо в группу
+    // car.add(model);
+    
 
     function onKeyDown(e :KeyboardEvent){
         switch (e.key){
@@ -60,15 +77,15 @@ const CarFunc=(
                 accelerate(-1);
                 break;
             case 'ArrowLeft':
-                steer(.2);
+                steer(1);
                 break;
             case 'ArrowRight':
-                steer(-.2);
+                steer(-1);
                 break;
         }
     }
 
-    function onKeyUp(e :KeyboardEvent){
+    function onKeyUp(e: KeyboardEvent){
         switch (e.key){
             case 'ArrowUp':
             case 'ArrowDown':
@@ -106,6 +123,7 @@ const CarFunc=(
                 }
             }
         }
+        steerCar()
     }
 
     function stop() {
@@ -123,16 +141,51 @@ const CarFunc=(
             }
         }
     }
-    
 
     function steer(val: number){
-        stringAngle = val;
+        if(val===1){
+            stringAngle+=rotateMoveCoe
+            if(stringAngle > .maxAngle)
+                stringAngle=maxAngle
+        }else if(val===-1){
+            stringAngle-=rotateMoveCoe
+            stringAngleCar-=rotateMoveCoe
+            if(stringAngle < -maxAngle)
+                stringAngle=-maxAngle
+        }
+        stringAngleCar=stringAngle // Запомним поворот колёс
         steerWheel(stringAngle);
     }
 
     function steerWheel(angle: number){
         wheelGroupFL.rotation.y = angle;
         wheelGroupFR.rotation.y = angle;
+        steerCar()
+    }
+
+    function steerCar(){
+        if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe// В пределах 0
+        if( stringAngleCar > 0)stringAngleCar += rotateMoveCoe// В пределах 0
+        if(velocity.z > 0){
+            car.rotation.y = stringAngleCar;
+            car.position.x = stringAngleCar;
+        }
+    }
+
+    car.add(camera,light)
+    function moveCar(direction: THREE.Vector3, delta: number){
+        var t=car.position.addScaledVector(direction,delta)
+        // light.position.addScaledVector(direction,delta)
+        // wheelGroupFL.position.addScaledVector(direction,delta)
+        // wheelGroupFR.position.addScaledVector(direction,delta)
+        // camera.position.addScaledVector(direction,delta)
+        camera.lookAt(t)
+    }
+
+    function rotateWheel(speed: number){
+        wheels.forEach(wheel=>{
+            wheel.rotation.x+=speed
+        })
     }
 
     function update(delta: number){
@@ -153,39 +206,12 @@ const CarFunc=(
         }
     }
 
-    function moveCar(direction: THREE.Vector3, delta: number){
-        var t=model.position.addScaledVector(direction,delta)
-        light.position.addScaledVector(direction,delta)
-        wheelGroupFL.position.addScaledVector(direction,delta)
-        wheelGroupFR.position.addScaledVector(direction,delta)
-        camera.position.addScaledVector(direction,delta)
-        camera.lookAt(t)
-    }
-
-    function rotateWheel(speed: number){
-        wheels.forEach(wheel=>{
-            wheel.rotation.x+=speed
-        })
-    }
-
     const clock=new THREE.Clock
 
     function animate() {
         /* const */var delta = clock.getDelta();
         update(delta)
         requestAnimationFrame(animate)
-
-        // Рассчитать новое направление и движение
-        const direction = new THREE.Vector3();
-        model.getWorldDirection(direction);
-        direction.multiplyScalar(moveSpeed);
-
-        // Применить движение
-        model.position.add(direction);
-
-        // Поворот автомобиля в зависимости от угла поворота
-        model.rotation.y += turnAngle;
-
     }
     animate();
 }

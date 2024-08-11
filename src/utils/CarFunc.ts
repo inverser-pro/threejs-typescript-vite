@@ -6,19 +6,19 @@ const CarFunc=(
     camera: THREE.Camera,
     light: THREE.Light
 )=>{
-    const acceleration: number        = .01;
-    const deceleration: number        = 0.002;
-    let isAccelerating: boolean       = false; // Флаг для отслеживания ускорения
-    let stringAngle : number          = 0;
-    let stringAngleCar : number       = 0;
-    const rotateMoveCoe : number      = .01;
-    const maxAngle : number           = .5;
-    const velocity : THREE.Vector3 = new THREE.Vector3(0,0,0);
+    const acceleration: number      = .01;
+    const deceleration: number      = 0.002;
+    let isAccelerating: boolean     = false; // Флаг для отслеживания ускорения
+    let stringAngle : number        = 0;
+    let stringAngleCar : number     = 0;
+    const rotateMoveCoe : number    = .01;
+    const maxAngle : number         = .5;
+    const velocity : THREE.Vector3  = new THREE.Vector3(0,0,0);
     const direction : THREE.Vector3 = new THREE.Vector3(0,0,1);
-    const car: THREE.Group            = new THREE.Group();
-    const wheels: THREE.Object3D[]    = [];
-    const wheelGroupFL: THREE.Group   = new THREE.Group();
-    const wheelGroupFR: THREE.Group   = new THREE.Group();
+    const car: THREE.Group          = new THREE.Group();
+    const wheels: THREE.Object3D[]  = [];
+    const wheelGroupFL: THREE.Group = new THREE.Group();
+    const wheelGroupFR: THREE.Group = new THREE.Group();
 
     scene.add(model);
     model.translateY(-.025)

@@ -4,7 +4,7 @@ const CarFunc=(
     model: THREE.Group,
     scene: THREE.Scene,
     camera: THREE.Camera,
-    light: THREE.Light
+    light: THREE.Light,
 )=>{
     const acceleration: number      = .01;   // ускорение
     const deceleration: number      = 0.002; // замедление
@@ -13,6 +13,8 @@ const CarFunc=(
     let   stringAngleCar : number   = 0;     // угол поворота авто, при наличии ненулевого угла поворота колёс
     const rotateMoveCoe : number    = .01;   // коэффициент вращения и поворота авто, при условии выше
     const maxAngle : number         = .5;    // максимальный угол поворота колёс
+    const maxSpeedFront : number    = .3;    // максимальная скорость для авто вперёд
+    const maxSpeedBack : number     = .2;    // ~ назад
     const velocity : THREE.Vector3  = new THREE.Vector3(0,0,0); // вектор перемещения авто (группы `car`)
     const direction : THREE.Vector3 = new THREE.Vector3(0,0,1); // вектор направления авто ~
     const car: THREE.Group          = new THREE.Group();        // группа для всех частей авто (авто + передние колёса)
@@ -23,7 +25,7 @@ const CarFunc=(
     model.translateY(-.025); // немного переместим авто вверх
     
     window.addEventListener('keydown', e=>onKeyDown(e)); // добавим прослушиватель события нажатия клавиш
-    window.addEventListener('keyup', e=>onKeyUp(e));     // ~ отжатия клавиш
+    window.addEventListener('keyup',   e=>onKeyUp(e));   // ~ отжатия клавиш
 
     // пройдём по всем дочерним элементам сцены GLB,
     // чтобы найти все колёса
@@ -33,7 +35,7 @@ const CarFunc=(
         }
     })
     // микрофункция для перемещения центров колёс, чтобы их можно было вращать вокруг своей оси, а не вокруг оси группы (изначально в THREE.Vector3(0,0,0))
-    function microFn(e: THREE.Object3D,grp: THREE.Group){
+    function microFn(e: THREE.Object3D,grp: THREE.Group):void{
             // Вычисляем центр колеса
             const box = new THREE.Box3().setFromObject(e)
                 , center = box.getCenter(new THREE.Vector3());
@@ -44,7 +46,7 @@ const CarFunc=(
             // Добавляем колесо в группу
             grp.add(e);
     }
-    // проёдум по всем колёсам в массиве и найдём только два передних, добавим их в отдельные группы, используя микрофункцию
+    // пройдём по всем колёсам в массиве и найдём только два передних, добавим их в отдельные группы, используя микрофункцию
     wheels.forEach(e=>{
         if (e?.name === 'wheelRF') {
             microFn(e,wheelGroupFR)
@@ -56,55 +58,56 @@ const CarFunc=(
     car.add(model, wheelGroupFL, wheelGroupFR)
     scene.add(car) // добавим эту грппу на сцену
 
-    function onKeyDown(e :KeyboardEvent){
+    // функция прослушивания событий нажатия клавиш
+    function onKeyDown(e :KeyboardEvent):void{
         switch (e.key){
-            case 'ArrowUp':
+            case 'ArrowUp': // кнопка вверх
                 accelerate(1);
                 break;
-            case 'ArrowDown':
+            case 'ArrowDown': // кнопка вниз
                 accelerate(-1);
                 break;
-            case 'ArrowLeft':
+            case 'ArrowLeft': // влево
                 steer(1);
                 break;
-            case 'ArrowRight':
+            case 'ArrowRight': // вправо
                 steer(-1);
                 break;
         }
     }
-
-    function onKeyUp(e: KeyboardEvent){
+    // функция прослушивания событий отжатия клавиш
+    function onKeyUp(e: KeyboardEvent):void{
         switch (e.key){
-            case 'ArrowUp':
-            case 'ArrowDown':
+            case 'ArrowUp':   // кнопка вверх
+            case 'ArrowDown': // кнопка вниз
                 accelerate(0);
                 break;
-            case 'ArrowLeft':
-            case 'ArrowRight':
+            case 'ArrowLeft':  // влево
+            case 'ArrowRight': // вправо
                 steer(0);
                 break;
         }
     }
-
-    function accelerate(val: number) {
-        if (val > 0) {
+    // фнукция для ускорения
+    function accelerate(val: number):void {
+        if (val > 0) { // при нажатой клавише вверх, мы добавляем скорость, но не более 
             // Разгон вперед
-            isAccelerating = true;
+            isAccelerating = true; // если присутствует ускорение
             velocity.z += val * acceleration;
-            if (velocity.z > .3) {
-                velocity.z = .3;
+            if (velocity.z > maxSpeedFront) {
+                velocity.z = maxSpeedFront;
             }
-        } else if (val < 0) {
+        } else if (val < 0) { // при нажатой клавише вниз, мы сначала замедляем авто (если было движение), затем направляем его назад
             // Торможение или движение назад
-            isAccelerating = true;
+            isAccelerating = true; // если присутствует ускорение
             if (velocity.z <= 0) {
                 // Если скорость уже отрицательная, разгоняем назад
                 velocity.z += val * acceleration;
-                if (velocity.z < -.2) {
-                    velocity.z = -.2;
+                if (velocity.z < -maxSpeedBack) {
+                    velocity.z = -maxSpeedBack;
                 }
             } else {
-                // Если автомобиль движется вперед, сначала тормозим
+                // Если автомобиль движется то тормозим
                 velocity.z += val * acceleration;
                 if (velocity.z < 0) {
                     velocity.z = 0;
@@ -113,8 +116,8 @@ const CarFunc=(
         }
         steerCar()
     }
-
-    function stop() {
+    // функция плавного торможения
+    function stop():void {
         if (velocity.z > 0) {
             // Плавное торможение вперед
             velocity.z -= deceleration;
@@ -129,29 +132,29 @@ const CarFunc=(
             }
         }
     }
-
-    function steer(val: number){
-        if(val===1){
+    // управление влево/вправо колёсами
+    function steer(val: number):void{
+        if(val===1){ // влево
             stringAngle+=rotateMoveCoe
             if(stringAngle > maxAngle)
                 stringAngle = maxAngle
-        }else if(val===-1){
+        }else if(val===-1){ // вправо
             stringAngle-=rotateMoveCoe
             stringAngleCar-=rotateMoveCoe
             if(stringAngle < -maxAngle)
                 stringAngle = -maxAngle
         }
-        stringAngleCar=stringAngle // Запомним поворот колёс
+        stringAngleCar=stringAngle // Запомним поворот колёс для дальнейшего поворота авто
         steerWheel(stringAngle);
     }
-
-    function steerWheel(angle: number){
-        wheelGroupFL.rotation.y = angle;
-        wheelGroupFR.rotation.y = angle;
-        steerCar()
+    // функция поворота колёс по оси Y (управление)
+    function steerWheel(angle: number):void{
+        wheelGroupFL.rotation.y = angle; // поворачиваем только группу
+        wheelGroupFR.rotation.y = angle; // поворачиваем только группу
+        steerCar() // управляем авто (<>)
     }
-
-    function steerCar(){
+    // функция поворота и перемещения авто
+    function steerCar():void{
         if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe //.5
         if( stringAngleCar > 0)stringAngleCar += rotateMoveCoe
         if(velocity.z > 0){
@@ -160,18 +163,19 @@ const CarFunc=(
         }
     }
 
-    car.add(camera,light)
+    car.add(camera,light) // добавим, чтобы управлять светом и камерой вместе с авто (перемещать/вращать)
+    // фнукция перемещения авто
     function moveCar(direction: THREE.Vector3, delta: number){
         var t=car.position.addScaledVector(direction,delta)
         camera.lookAt(t)
     }
-
+    // функция вращения колёс по оси X (движение)
     function rotateWheel(speed: number){
         wheels.forEach(wheel=>{
             wheel.rotation.x+=speed
         })
     }
-
+    // фнукция обновления данных
     function update(delta: number){
         velocity.multiplyScalar(1); // Замедление
         const moveVector = direction.clone().multiplyScalar(velocity.z * delta);
@@ -190,13 +194,12 @@ const CarFunc=(
         }
     }
 
-    const clock=new THREE.Clock
-
-    function animate() {
-        var delta = clock.getDelta();
-        update(delta)
-        requestAnimationFrame(animate)
-    }
-    animate();
+    const clock=new THREE.Clock; // просто время для отслежнивания изменений жизненного цикла приложения
+    // функция анимирования сцены
+    (function animate() {
+        const delta = clock.getDelta(); // вычисляем дельту времени
+        update(delta);
+        requestAnimationFrame(animate); // рекурсивный вызов для продолжения анимации
+    })();
 }
 export default CarFunc;

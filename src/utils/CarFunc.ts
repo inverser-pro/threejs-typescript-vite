@@ -197,7 +197,7 @@ const CarFunc=(
     const clock=new THREE.Clock; // просто время для отслежнивания изменений жизненного цикла приложения
     // функция анимирования сцены
     (function animate() {
-        const delta = clock.getDelta(); // вычисляем дельту времени
+        var delta = clock.getDelta(); // вычисляем дельту времени
         update(delta);
         requestAnimationFrame(animate); // рекурсивный вызов для продолжения анимации
     })();

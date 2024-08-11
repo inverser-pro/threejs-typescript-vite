@@ -6,32 +6,33 @@ const CarFunc=(
     camera: THREE.Camera,
     light: THREE.Light
 )=>{
-    const acceleration: number      = .01;
-    const deceleration: number      = 0.002;
+    const acceleration: number      = .01;   // ускорение
+    const deceleration: number      = 0.002; // замедление
     let   isAccelerating: boolean   = false; // Флаг для отслеживания ускорения
-    let   stringAngle : number      = 0;
-    let   stringAngleCar : number   = 0;
-    const rotateMoveCoe : number    = .01;
-    const maxAngle : number         = .5;
-    const velocity : THREE.Vector3  = new THREE.Vector3(0,0,0);
-    const direction : THREE.Vector3 = new THREE.Vector3(0,0,1);
-    const car: THREE.Group          = new THREE.Group();
-    const wheels: THREE.Object3D[]  = [];
-    const wheelGroupFL: THREE.Group = new THREE.Group();
-    const wheelGroupFR: THREE.Group = new THREE.Group();
+    let   stringAngle : number      = 0;     // угол поворота колёс
+    let   stringAngleCar : number   = 0;     // угол поворота авто, при наличии ненулевого угла поворота колёс
+    const rotateMoveCoe : number    = .01;   // коэффициент вращения и поворота авто, при условии выше
+    const maxAngle : number         = .5;    // максимальный угол поворота колёс
+    const velocity : THREE.Vector3  = new THREE.Vector3(0,0,0); // вектор перемещения авто (группы `car`)
+    const direction : THREE.Vector3 = new THREE.Vector3(0,0,1); // вектор направления авто ~
+    const car: THREE.Group          = new THREE.Group();        // группа для всех частей авто (авто + передние колёса)
+    const wheels: THREE.Object3D[]  = [];                       // массив для колёс (находим их в GLB сцене)
+    const wheelGroupFL: THREE.Group = new THREE.Group();        // группа, которая позволяет вращать левое колесов
+    const wheelGroupFR: THREE.Group = new THREE.Group();        // ~ правое колесо
 
-    scene.add(model);
-    model.translateY(-.025)
+    model.translateY(-.025); // немного переместим авто вверх
     
-    window.addEventListener('keydown', e=>onKeyDown(e));
-    window.addEventListener('keyup', e=>onKeyUp(e));
+    window.addEventListener('keydown', e=>onKeyDown(e)); // добавим прослушиватель события нажатия клавиш
+    window.addEventListener('keyup', e=>onKeyUp(e));     // ~ отжатия клавиш
 
+    // пройдём по всем дочерним элементам сцены GLB,
+    // чтобы найти все колёса
     model.traverse(child => {
-        if(child?.name?.includes('wheel')){
-            wheels.push(child);
+        if(child?.name?.includes('wheel')){ // в Blender мы добавили имена всем колёсам, чтобы затем здесь их найти
+            wheels.push(child);             // добавим в массив с колёсами каждое найденное колесо (имя начинается с wheel.. (ex.: `wheelLF`) )
         }
     })
-
+    // микрофункция для перемещения центров колёс, чтобы их можно было вращать вокруг своей оси, а не вокруг оси группы (изначально в THREE.Vector3(0,0,0))
     function microFn(e: THREE.Object3D,grp: THREE.Group){
             // Вычисляем центр колеса
             const box = new THREE.Box3().setFromObject(e)
@@ -43,7 +44,7 @@ const CarFunc=(
             // Добавляем колесо в группу
             grp.add(e);
     }
-
+    // проёдум по всем колёсам в массиве и найдём только два передних, добавим их в отдельные группы, используя микрофункцию
     wheels.forEach(e=>{
         if (e?.name === 'wheelRF') {
             microFn(e,wheelGroupFR)
@@ -51,22 +52,9 @@ const CarFunc=(
             microFn(e,wheelGroupFL)
         }
     })
-
+    // добавим все группы (авто и два передних колеса) к группе `car`
     car.add(model, wheelGroupFL, wheelGroupFR)
-    
-    // scene.add(wheelGroupFL)
-    // scene.add(wheelGroupFR)
-    scene.add(car)
-
-    // const box = new THREE.Box3().setFromObject(model)
-    //             , center = box.getCenter(new THREE.Vector3());
-    // // Перемещаем группу в центр колеса
-    // car.position.copy(center);
-    // // Перемещаем колесо так, чтобы его центр совпал с началом координат группы
-    // model.position.sub(center);
-    // // Добавляем колесо в группу
-    // car.add(model);
-    
+    scene.add(car) // добавим эту грппу на сцену
 
     function onKeyDown(e :KeyboardEvent){
         switch (e.key){
@@ -164,7 +152,7 @@ const CarFunc=(
     }
 
     function steerCar(){
-        if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe
+        if( stringAngleCar < 0)stringAngleCar -= rotateMoveCoe //.5
         if( stringAngleCar > 0)stringAngleCar += rotateMoveCoe
         if(velocity.z > 0){
             car.rotation.y = stringAngleCar;

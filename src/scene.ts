@@ -20,11 +20,11 @@ let renderer: WebGLRenderer
   , scene: Scene
   , pointLight: PointLight
   , camera: PerspectiveCamera
-  , clock: Clock
+  // , clock: Clock
   , stats: Stats
-
+  , cameraControls: OrbitControls
+;
 const DEBUG = 0;
-let cameraControls: OrbitControls;
 
 init()
 animate()
@@ -73,7 +73,7 @@ function init() {
       cameraControls.update()
     }
   // загрука и добавление GLB модели на сцену
-  const model = loadModel(settings.model1,scene,camera,pointLight);
+  /* const model =  */loadModel(settings.model1,scene,camera,pointLight);
 
   { // добавляем сетку
     const gridHelper = new GridHelper(9999, 9999, 'teal', 'darkgray')
@@ -82,7 +82,7 @@ function init() {
   }
 
   { // время и статистика частоты отрисовки сцены
-    clock = new Clock()
+    new Clock()
     stats = new Stats()
     document.body.appendChild(stats.dom)
   }

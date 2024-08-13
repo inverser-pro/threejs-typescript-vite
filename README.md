@@ -6,6 +6,8 @@ Model downloaded from https://sketchfab.com/3d-models/mazda-rx-7-car-404b2aefdf0
 
 [Перейти к списку воспроизведения на YouTube](https://www.youtube.com/watch?v=Ph9B6r57Vnk&list=PL0XYm8bdyeFDGJmFeHDiEXsmLfq3vWBaj&index=32)
 
+[CodeSandBox](https://codesandbox.io/p/devbox/github/inverser-pro/threejs-typescript-vite/tree/main/)
+
 # Three.js Vite Template with TypeScript
 
 Three.js + Vite + TypeScript starter
